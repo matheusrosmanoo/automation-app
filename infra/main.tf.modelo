@@ -1,0 +1,27 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.62.0"
+    }
+  }
+
+  backend "s3" {
+    bucket = "<BUCKET_STATE_NAME>"
+    key = "<BUCKET_STATE_KEY>"
+    region = "<AWS_STATE_REGION>"
+  }
+}
+
+provider "aws" {
+  region = "<AWS_RESOURCES_REGION>"
+
+  default_tags {
+    tags = {
+        ProductName = "oobattousai"
+        Environment = "Production"
+        ResourcesDefinitionBy = "Terraform"
+        ResourceName = "Automation app"
+    }
+  }
+}
