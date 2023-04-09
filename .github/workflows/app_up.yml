@@ -43,5 +43,8 @@ jobs:
           sed -i "s|<AWS_STATE_REGION>|${{ vars.AWS_STATE_REGION }}|g" main.tf
           sed -i "s|<AWS_RESOURCES_REGION>|${{ vars.AWS_RESOURCES_REGION }}|g" main.tf
 
+      - name: Check terraform version
+        run: terraform --version
+
       - name: Terraform init
         run: terraform init
