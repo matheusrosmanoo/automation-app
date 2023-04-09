@@ -1,0 +1,47 @@
+name: App up
+
+on:
+  push:
+    branches:
+      - main
+      - feat/create-infra-terraform
+    paths:
+      - ".github/workflows/app_up.yml"
+      - "infra/**"
+
+env:
+  TERRAFORM_VERSION: "1.4.4"
+
+jobs:
+  infra_up:
+    name: Infra up
+    runs-on: ubuntu-22.04
+    environment: production
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials For GitHub Actions
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY }}"
+          aws-secret-access-key: "${{ secrets.AWS_SECRET_KEY }}"
+          aws-region: ${{ vars.AWS_RESOURCES_REGION }}
+
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Replace strings on main.tf
+        run: |
+          mv main.tf.modelo main.tf
+          sed -i "s|<BUCKET_STATE_NAME>|${{ vars.BUCKET_STATE_NAME }}|g" main.tf
+          sed -i "s|<BUCKET_STATE_KEY>|${{ vars.BUCKET_STATE_KEY }}|g" main.tf
+          sed -i "s|<AWS_STATE_REGION>|${{ vars.AWS_STATE_REGION }}|g" main.tf
+          sed -i "s|<AWS_RESOURCES_REGION>|${{ vars.AWS_RESOURCES_REGION }}|g" main.tf
+
+      - name: Terraform init
+        run: terraform init
