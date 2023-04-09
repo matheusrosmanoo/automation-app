@@ -14,7 +14,7 @@ module "vpc" {
   enable_vpn_gateway = false
 
   tags = {
-    Name = "${var.appName}-vpc"
+    Name = "${var.appName}-${var.productName}-vpc"
     Type = "VPC"
   }
 }
