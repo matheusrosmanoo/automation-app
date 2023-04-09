@@ -8,7 +8,7 @@ terraform {
 
   backend "s3" {
     bucket = "<BUCKET_STATE_NAME>"
-    key = "<BUCKET_STATE_KEY>"
+    key = "<BUCKET_STATE_KEY>-infra"
     region = "<AWS_STATE_REGION>"
   }
 }

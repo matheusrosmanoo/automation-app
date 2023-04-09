@@ -19,7 +19,7 @@ jobs:
     environment: production
     defaults:
       run:
-        working-directory: terraform
+        working-directory: terraform/infra
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,6 +35,9 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
+      - name: Check terraform version
+        run: terraform --version
+
       - name: Replace strings on main.tf
         run: |
           mv main.tf.modelo main.tf
@@ -43,8 +46,17 @@ jobs:
           sed -i "s|<AWS_STATE_REGION>|${{ vars.AWS_STATE_REGION }}|g" main.tf
           sed -i "s|<AWS_RESOURCES_REGION>|${{ vars.AWS_RESOURCES_REGION }}|g" main.tf
 
-      - name: Check terraform version
-        run: terraform --version
+      - name: Create terraform.tfvars file
+        run: |
+          cat >terraform.tfvars<<EOL
+          region="${{ vars.AWS_RESOURCES_REGION }}"
+          EOL
 
       - name: Terraform init
         run: terraform init
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve
